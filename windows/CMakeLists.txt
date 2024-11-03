@@ -11,7 +11,7 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Replace add_subdirectory that references old C++ code with Cargokit:
 include("../cargokit/cmake/cargokit.cmake")
-apply_cargokit(${PROJECT_NAME} ../rust rust_ffi_plugin "")
+apply_cargokit(${PROJECT_NAME} ../rust rust_file "")
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # Invoke the build for native code shared with the other target platforms.
@@ -29,7 +29,7 @@ set(rust_file_bundled_libraries
   # Replace original target file with the one produced by Cargokit:
   "${${PROJECT_NAME}_cargokit_lib}"
   # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  # $<TARGET_FILE:rust_ffi_plugin>
+  # $<TARGET_FILE:rust_file>
 
   PARENT_SCOPE
 )
