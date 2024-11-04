@@ -13,8 +13,12 @@ extension FileExtension on File {
   String get pathWithNewExtension => '$parent/$nameWithoutExtension.$extension';
   String get pathWithNewName => '$parent/$nameWithoutExtension';
 
-  Future<(String?, String?)> fastCopy(String dest) async {
-    return await fastCopyIsolate(path, dest);
+  Future<bool> fastCopy(String dest) async {
+    final r = await fastCopyIsolate(path, dest);
+    if (r.success == false) {
+      return throw Exception(r.error);
+    }
+    return r.success ?? false;
   }
 
   Future<void> fastMove(String dest) async {}

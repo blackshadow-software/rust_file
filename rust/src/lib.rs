@@ -1,3 +1,6 @@
+pub mod functions;
+pub mod models;
+
 use libc::c_char;
 use std::{time::Duration, usize};
 
@@ -23,12 +26,12 @@ mod tests {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn fast_copy(src: *const c_char, dest: *const c_char) -> *const c_char {
-    let src = unsafe { std::ffi::CStr::from_ptr(src) };
-    let dest = unsafe { std::ffi::CStr::from_ptr(dest) };
-    let src = src.to_str().unwrap();
-    let dest = dest.to_str().unwrap();
-    println!("src: {}, dest: {}", src, dest);
-    src.as_ptr() as *const c_char
-}
+// #[no_mangle]
+// pub extern "C" fn fast_copy(src: *const c_char, dest: *const c_char) -> *const c_char {
+//     let src = unsafe { std::ffi::CStr::from_ptr(src) };
+//     let dest = unsafe { std::ffi::CStr::from_ptr(dest) };
+//     let src = src.to_str().unwrap();
+//     let dest = dest.to_str().unwrap();
+//     println!("src: {}, dest: {}", src, dest);
+//     src.as_ptr() as *const c_char
+// }

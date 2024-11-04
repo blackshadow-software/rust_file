@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ffi' as ffi;
 import 'dart:isolate';
 import 'package:ffi/ffi.dart' as package_ffi;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:rust_file/src/models/model.dart';
 import '../init.dart';
 
 typedef FastCopyFunc = PointerType Function(PointerType src, PointerType dest);
@@ -24,31 +25,40 @@ Future<String> fastCopyDart(String src, String dest) async {
   return result;
 }
 
-Future<(String?, String?)> fastCopyIsolate(String src, String dest) async {
+Future<Response> fastCopyIsolate(String src, String dest) async {
   final receivePort = ReceivePort();
-  String? result, err;
+  Response? result;
 
-  final completer = Completer<(String?, String?)>();
+  final completer = Completer<Response>();
   await Isolate.spawn((List m) async {
-    // await appConfigDBSync(m.last as RootIsolateToken);
     SendPort sendPort = m[0] as SendPort;
-    final src = m[2] as String;
-    final dest = m[3] as String;
-    sendPort.send('$src -> $dest');
+    try {
+      final src = m[2] as String;
+      final dest = m[3] as String;
+      final r = await fastCopyDart(src, dest);
+      print('0 $r ');
+      final result = Response.fromRawJson(r);
+      print('1 ${result.toString()}');
+      return sendPort.send(result);
+    } catch (e) {
+      print(e);
 
-    return sendPort.send('l');
+      return sendPort.send(e.toString());
+    }
   }, [receivePort.sendPort, ServicesBinding.rootIsolateToken!, src, dest]);
   receivePort.listen((message) {
-    if (message is String) {
+    print('2 $message');
+
+    if (message is Response) {
       result = message;
-      print(result);
+      debugPrint(result.toString());
     } else {
-      err = 'invalid message';
-      print(err);
+      result = Response(success: false, error: 'Something went wrong from thread!');
+      debugPrint(result.toString());
     }
 
     receivePort.close();
-    completer.complete((err, result));
+    completer.complete(result);
   });
 
   return (await completer.future);
