@@ -71,7 +71,8 @@ class _MyAppState extends State<MyApp> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            await File('example/test/widget_test.dart').fastCopy('example/test/widget_test2.dart');
+            final r = await File('example/test/widget_test.dart').fastCopy('example/test/widget_test2.dart');
+            debugPrint(r);
           },
           child: const Icon(Icons.refresh),
         ),
