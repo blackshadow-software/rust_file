@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import '../functions/copy.dart';
+
 extension FileExtension on File {
   String get name => path.split('/').last.split('\\').last;
   String get extension => path.split('.').last;
@@ -11,7 +13,10 @@ extension FileExtension on File {
   String get pathWithNewExtension => '$parent/$nameWithoutExtension.$extension';
   String get pathWithNewName => '$parent/$nameWithoutExtension';
 
-  Future<void> fastCopy(String dest) async {}
+  Future<String?> fastCopy(String dest) async {
+    return await fastCopyDart(path, dest);
+  }
+
   Future<void> fastMove(String dest) async {}
   Future<void> fastDelete() async {}
 }

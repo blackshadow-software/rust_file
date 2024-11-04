@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -66,6 +68,12 @@ class _MyAppState extends State<MyApp> {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            await File('example/test/widget_test.dart').fastCopy('example/test/widget_test2.dart');
+          },
+          child: const Icon(Icons.refresh),
         ),
       ),
     );

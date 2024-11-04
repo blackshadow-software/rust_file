@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ffi' as ffi;
 import 'utils/const.dart';
 
-final ffi.DynamicLibrary _dylib = () {
+final ffi.DynamicLibrary dylib = () {
   if (Platform.isMacOS || Platform.isIOS) {
     return ffi.DynamicLibrary.open('$libName.framework/$libName');
   }
@@ -15,7 +15,7 @@ final ffi.DynamicLibrary _dylib = () {
   throw UnsupportedError('Unknown platform: ${Platform.operatingSystem}');
 }();
 
-final RustFileBindings bindings = RustFileBindings(_dylib);
+final RustFileBindings bindings = RustFileBindings(dylib);
 
 class RustFileBindings {
   final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) _lookup;
