@@ -65,6 +65,7 @@ class _MyAppState extends State<MyApp> {
                     );
                   },
                 ),
+                const CircularProgressIndicator(),
               ],
             ),
           ),
@@ -72,7 +73,7 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             final r = await File('example/test/widget_test.dart').fastCopy('example/test/widget_test2.dart');
-            debugPrint(r);
+            debugPrint('Err ${r.$1} Result ${r.$2}');
           },
           child: const Icon(Icons.refresh),
         ),
