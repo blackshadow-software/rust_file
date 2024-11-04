@@ -1,7 +1,5 @@
 pub mod functions;
 pub mod models;
-
-use libc::c_char;
 use std::{time::Duration, usize};
 
 #[no_mangle]

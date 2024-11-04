@@ -73,7 +73,8 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             try {
-              final r = await File('example/test/widget_test.dart').fastCopy('example/test/widget_test2.dart');
+              final r = await File('/home/remon/Office/rust_file/example/test/widget_test.dart')
+                  .fastCopy('/home/remon/Office/rust_file/example/test/widget_test_3.dart');
               debugPrint('Cipied : $r');
             } catch (e) {
               print(e);
