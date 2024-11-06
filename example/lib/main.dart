@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show File, Directory;
 import 'package:rust_file/rust_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,7 +82,12 @@ class CopyExample extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: FilledButton.icon(
-                    onPressed: () async => await ref.read(copyProvider('dir').notifier).copyDir(), // ? copy file
+                    onPressed: () async {
+                      final err = await ref.read(copyProvider('dir').notifier).copyDir();
+                      if (err != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+                      }
+                    }, // ? copy dir
                     label: const Text('Copy')),
               ),
               if (dir != null) Text('$dir ms taken')
@@ -113,10 +118,10 @@ class Copy extends _$Copy {
     final f = ref.read(textCtrlProvider('From File Path')).text.trim();
     final t = ref.read(textCtrlProvider('To File Path')).text.trim();
     final from = File(f);
-    final to = File('/Users/remon/Rust/untitled folder/test.txt');
+    final to = File(t);
     try {
       final stopwatch = Stopwatch()..start();
-      // await from.fastCopy(to);
+      await from.fastCopy(to);
       if (!await to.exists()) {
         await to.create();
       }
@@ -130,7 +135,22 @@ class Copy extends _$Copy {
     }
   }
 
-  Future<void> copyDir() async {}
+  Future<String?> copyDir() async {
+    final f = ref.read(textCtrlProvider('From Directory Path')).text.trim();
+    final t = ref.read(textCtrlProvider('To Directory Path')).text.trim();
+    final from = Directory(f);
+    final to = Directory(t);
+    try {
+      final stopwatch = Stopwatch()..start();
+      await from.fastCopy(to);
+      stopwatch.stop();
+      state = stopwatch.elapsedMilliseconds;
+      return null;
+    } catch (e) {
+      debugPrint(e.toString());
+      return e.toString();
+    }
+  }
 }
 
 
