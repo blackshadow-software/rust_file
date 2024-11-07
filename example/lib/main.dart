@@ -1,4 +1,7 @@
-import 'dart:io' show File, Directory;
+import 'dart:developer';
+import 'dart:io' show Directory, File, Platform;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rust_file/rust_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,6 +56,7 @@ class CopyExample extends ConsumerWidget {
                 padding: const EdgeInsets.all(10),
                 child: FilledButton.icon(
                     onPressed: () async {
+                      await permission();
                       final err = await ref.read(copyProvider('file').notifier).copyFile();
                       if (err != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
@@ -83,6 +87,7 @@ class CopyExample extends ConsumerWidget {
                 padding: const EdgeInsets.all(10),
                 child: FilledButton.icon(
                     onPressed: () async {
+                      await permission();
                       final err = await ref.read(copyProvider('dir').notifier).copyDir();
                       if (err != null && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
@@ -115,10 +120,13 @@ class Copy extends _$Copy {
   int? build(String f) => null;
 
   Future<String?> copyFile() async {
+    final directory = await getExternalStorageDirectory();
+    log(directory.toString());
     final f = ref.read(textCtrlProvider('From File Path')).text.trim();
     final t = ref.read(textCtrlProvider('To File Path')).text.trim();
     final from = File(f);
     final to = File(t);
+
     try {
       final stopwatch = Stopwatch()..start();
       await from.fastCopy(to);
@@ -140,6 +148,7 @@ class Copy extends _$Copy {
     final t = ref.read(textCtrlProvider('To Directory Path')).text.trim();
     final from = Directory(f);
     final to = Directory(t);
+
     try {
       final stopwatch = Stopwatch()..start();
       await from.fastCopy(to);
@@ -153,94 +162,20 @@ class Copy extends _$Copy {
   }
 }
 
-
-// import 'dart:io';
-
-// import 'package:flutter/material.dart';
-// import 'dart:async';
-
-// import 'package:rust_file/rust_file.dart' as rust_file;
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   late int sumResult;
-//   late Future<int> sumAsyncResult;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     sumResult = rust_file.sum(1, 2);
-//     sumAsyncResult = rust_file.sumAsync(3, 4);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     const textStyle = TextStyle(fontSize: 25);
-//     const spacerSmall = SizedBox(height: 10);
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Native Packages'),
-//         ),
-//         body: SingleChildScrollView(
-//           child: Container(
-//             padding: const EdgeInsets.all(10),
-//             child: Column(
-//               children: [
-//                 const Text(
-//                   'This calls a native function through FFI that is shipped as source in the package. '
-//                   'The native code is built as part of the Flutter Runner build.',
-//                   style: textStyle,
-//                   textAlign: TextAlign.center,
-//                 ),
-//                 spacerSmall,
-//                 Text(
-//                   'sum(1, 2) = $sumResult',
-//                   style: textStyle,
-//                   textAlign: TextAlign.center,
-//                 ),
-//                 spacerSmall,
-//                 FutureBuilder<int>(
-//                   future: sumAsyncResult,
-//                   builder: (BuildContext context, AsyncSnapshot<int> value) {
-//                     final displayValue = (value.hasData) ? value.data : 'loading';
-//                     return Text(
-//                       'await sumAsync(3, 4) = $displayValue',
-//                       style: textStyle,
-//                       textAlign: TextAlign.center,
-//                     );
-//                   },
-//                 ),
-//                 const CircularProgressIndicator(),
-//               ],
-//             ),
-//           ),
-//         ),
-//         floatingActionButton: FloatingActionButton(
-//           onPressed: () async {
-//             try {
-//               final r = await File('/home/remon/Office/rust_file/example/test/widget_test.dart')
-//                   .fastCopy('/home/remon/Office/rust_file/example/test/widget_test_3.dart');
-//               debugPrint('Cipied : $r');
-//             } catch (e) {
-//               print(e);
-//             }
-//           },
-//           child: const Icon(Icons.refresh),
-//         ),
-//       ),
-//     );
-//   }
-// }
- 
-  
+Future<void> permission() async {
+  switch (Platform.operatingSystem) {
+    case 'android':
+      if (!await Permission.storage.status.isGranted) {
+        await Permission.storage.request();
+      }
+      break;
+    case 'ios':
+      break;
+    case 'linux':
+      break;
+    case 'macos':
+      break;
+    case 'windows':
+      break;
+  }
+}
